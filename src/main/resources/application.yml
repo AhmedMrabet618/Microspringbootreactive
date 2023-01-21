@@ -1,0 +1,13 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id:
+            client-secret: 
+server:
+  ssl:
+    key-store: classpath:secure.p12
+    key-store-password: password
+    key-password: password

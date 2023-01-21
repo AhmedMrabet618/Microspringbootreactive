@@ -55,4 +55,21 @@ class InventoryService {
             .flatMap(cart -> this.cartRepository.save(cart));
     }
 
+    Mono<Cart> removeOneFromCart(String cartId, String itemId) {
+        return this.cartRepository.findById(cartId)
+            .defaultIfEmpty(new Cart(cartId))
+            .flatMap(cart -> cart.getCartItems().stream()
+                .filter(cartItem -> cartItem.getItem().getId().equals(itemId))
+                .findAny()
+                .map(cartItem -> {
+                    cartItem.decrement();
+                    return Mono.just(cart);
+                }) 
+                .orElse(Mono.empty()))
+            .map(cart -> new Cart(cart.getId(), cart.getCartItems().stream()
+                .filter(cartItem -> cartItem.getQuantity() > 0)
+                .collect(Collectors.toList())))
+            .flatMap(cart -> this.cartRepository.save(cart));
+    }
+
 }
